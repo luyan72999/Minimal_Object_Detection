@@ -7,18 +7,24 @@ from training_dataset import *
 def train_model(net, dataloader, batchSize, lr_rate):
     criterion = nn.MSELoss()
     optimization = optim.SGD(net.parameters(), lr=lr_rate)
-    scheduler = optim.lr_scheduler.StepLR(optimization, step_size=30, gamma=0.1)
+
+    # Check if CUDA is available
+    if torch.cuda.is_available():
+        net.cuda()
 
     for epoch in range(30):
-
-        scheduler.step()
 
         for i, data in enumerate(dataloader):
             optimization.zero_grad()
 
             inputs, labels = data
 
-            inputs, labels = inputs.view(batchSize,1, 100, 100), labels.view(batchSize, 4)
+            # Move inputs and labels to the GPU if available
+            if torch.cuda.is_available():
+                inputs = inputs.cuda()
+                labels = labels.cuda()
+
+            inputs, labels = inputs.view(batchSize, 1, 100, 100), labels.view(batchSize, 4)
 
             outputs = net(inputs)
 
@@ -26,14 +32,13 @@ def train_model(net, dataloader, batchSize, lr_rate):
             loss.backward()
             optimization.step()
 
-            pbox = outputs.detach().numpy()
-            gbox = labels.detach().numpy()
+            pbox = outputs.detach().cpu().numpy()  # Move back to CPU for numpy operations
+            gbox = labels.detach().cpu().numpy()
             score, _ = overlapScore(pbox, gbox)
 
             print('[epoch %5d, step: %d, loss: %f, Average Score = %f' % (epoch+1, i+1, loss.item(), score/batchSize))
 
     print('Finish Training')
-
 
 if __name__ == '__main__':
     # Hyperparameters
@@ -53,7 +58,5 @@ if __name__ == '__main__':
     model = cnn_model()
     model.train()
 
-    train_model(model, dataLoader, batch,learning_rate)
+    train_model(model, dataLoader, batch, learning_rate)
     torch.save(model.state_dict(), './Model/cnn_model.pth')
-
-
