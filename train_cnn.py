@@ -1,21 +1,15 @@
-import torch
-import torch.nn as nn
 import torch.optim as optim
-from torch.utils.data import DataLoader
-import numpy as np
-import pandas as pd
 from functions import overlapScore
-
-
+from torch.utils.data import DataLoader
 from cnn_model import *
 from training_dataset import *
 
-def train_model(net, dataloader, batchSize, lr_rate, momentum):
+def train_model(net, dataloader, batchSize, lr_rate):
     criterion = nn.MSELoss()
-    optimization = optim.SGD(net.parameters(), lr=lr_rate, momentum=momentum)
+    optimization = optim.SGD(net.parameters(), lr=lr_rate)
     scheduler = optim.lr_scheduler.StepLR(optimization, step_size=30, gamma=0.1)
 
-    for epoch in range(50):
+    for epoch in range(30):
 
         scheduler.step()
 
@@ -42,13 +36,11 @@ def train_model(net, dataloader, batchSize, lr_rate, momentum):
 
 
 if __name__ == '__main__':
-    # Hyper parameters
-    learning_rate = 0.000001
-    momentum = 0.9
+    # Hyperparameters
+    learning_rate = 0.1
     batch = 100
     no_of_workers = 2
     shuffle = True
-
 
     trainingdataset = training_dataset()
     dataLoader = DataLoader(
@@ -61,7 +53,7 @@ if __name__ == '__main__':
     model = cnn_model()
     model.train()
 
-    train_model(model, dataLoader, batch,learning_rate, momentum)
+    train_model(model, dataLoader, batch,learning_rate)
     torch.save(model.state_dict(), './Model/cnn_model.pth')
 
 
