@@ -1,3 +1,5 @@
+![Sample Prediction](sample_prediction.png)
+
 # Simple Object Detection using Convolutional Neural Network
 Object detection is one of the fundamental problem in computer vision. Given an image, the goal is to detect the objects within
 the image, by generating a rectangular box (bounding box) around the objects. Obviously, there can be multiple objects in an 
@@ -19,5 +21,3 @@ The dataset we have used here is very simple and is generated in python. Each im
 box of random size and shape and at random positions. For background the color value is set to 0 and for box it is set to 255. 
 The training dataset has 1000 of such images and the test dataset consists of 200 images. The corresponding ground truth 
 information are stored in separate file.
-
-To use the pretrained model, download the trained model from the Model folder.
